@@ -8,7 +8,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
 const authRouter = require("./routes/auth");
-const carsRouter = require('./routes/cars')
+const carsRouter = require("./routes/cars");
 const addressVerifyRouter = require("./routes/addressVerify");
 const distanceCalculationRouter = require("./routes/distanceCalculation");
 
@@ -17,7 +17,7 @@ const app = express();
 const limiter = rateLimit({
   windowMs: 30 * 1000,
   max: 30,
-  message: "Too many requests from this IP, please try again after 30 seconds"
+  message: "Too many requests from this IP, please try again after 30 seconds",
 });
 
 app.use(limiter);
@@ -33,10 +33,10 @@ app.use(
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/auth", authRouter);
-app.use('/cars', carsRouter);
-app.use("/address-verify", addressVerifyRouter);
-app.use("/distance-calculation", distanceCalculationRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/cars", carsRouter);
+app.use("/api/address-verify", addressVerifyRouter);
+app.use("/api/distance-calculation", distanceCalculationRouter);
 
 mongoose.connect(process.env.MONGO_URL);
 mongoose.connection.on("connected", () => {
