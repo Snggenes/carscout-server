@@ -25,7 +25,7 @@ const carSchema = new mongoose.Schema({
   price: { type: Number, required: true, enum: prices },
   year: { type: Number, required: true, enum: years },
   km: { type: Number, required: true, enum: km },
-  power: { type: Number, required: true, enum: power},
+  power: { type: Number, required: true, enum: power },
   color: { type: String, required: true, enum: colors },
   seat: { type: Number, required: true, enum: seats },
   door: { type: Number, required: true, enum: doors },
@@ -36,7 +36,7 @@ const carSchema = new mongoose.Schema({
   upholstery: { type: String, required: true, enum: upholstery },
   image: [{ type: String, default: [] }],
   description: { type: String },
-  owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  owner: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
   createdAt: { type: Date, default: Date.now },
   address: {
     type: {
@@ -47,7 +47,8 @@ const carSchema = new mongoose.Schema({
       province: { type: String, required: true },
       latitude: { type: Number, required: true },
       longitude: { type: Number, required: true },
-    }, required: true
+    },
+    required: true,
   },
 });
 

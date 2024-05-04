@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const UserModel = require("../models/user");
+const CarModel = require("../models/car");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv").config();
@@ -68,6 +69,8 @@ router.get("/profile", async (req, res) => {
       email: user.email,
       username: user.username,
       _id: user._id,
+      cars: user.cars,
+      favorites: user.favorites,
     };
     return res.json({ safeUser });
   } catch (error) {
@@ -78,6 +81,50 @@ router.get("/profile", async (req, res) => {
 router.get("/protected", authMiddleware, (req, res) => {
   const user = req.user;
   return res.json({ user });
+});
+
+router.put("/favorites", authMiddleware, async (req, res) => {
+  const user = req.user;
+  const { id } = req.body;
+
+  try {
+    if (!id) {
+      return res.status(400).json({ error: "Invalid ID" });
+    }
+
+    const isOwnCar = user.cars.includes(id);
+
+    if (isOwnCar) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
+    const isCarInFavorites = user.favorites.includes(id);
+
+    if (isCarInFavorites) {
+      user.favorites = user.favorites.filter((carId) => carId !== id);
+      await user.save();
+      return res
+        .status(200)
+        .json({ message: "Car removed from favorites", data: user });
+    }
+
+    user.favorites.push(id);
+    await user.save();
+    res.status(200).json({ message: "Car added to favorites", data: user });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.get("/favorites", authMiddleware, async (req, res) => {
+  const user = req.user;
+  const favorites = user.favorites;
+  try {
+    const cars = await CarModel.find({ _id: { $in: favorites } });
+    res.status(200).json({ data: cars });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 });
 
 module.exports = router;
