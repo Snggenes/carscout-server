@@ -38,6 +38,7 @@ const carSchema = new mongoose.Schema({
   description: { type: String },
   owner: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
   createdAt: { type: Date, default: Date.now },
+  clickCounter: { type: Number, default: 0 },
   address: {
     type: {
       city: { type: String, required: true },

@@ -17,7 +17,7 @@ router.post("/", authMiddleware, async (req, res) => {
     return res.status(400).json({ error: "Invalid address" });
   }
 
-  const car = { ...req.body, address, owner: user._id};
+  const car = { ...req.body, address, owner: user._id };
 
   try {
     const newCar = new CarModel(car);
@@ -34,6 +34,29 @@ router.post("/", authMiddleware, async (req, res) => {
 
 router.get("/", async (req, res) => {
   const { id } = req.query;
+  const { random } = req.query;
+  const { limit } = req.query;
+
+  if (random) {
+    const cachedCars = cache.get("randomCars");
+    if (cachedCars) {
+      return res
+        .status(200)
+        .json({ data: cachedCars, message: "Last added cars" });
+    }
+
+    try {
+      const lastAddedCars = await CarModel.find()
+        .sort({ createdAt: -1 })
+        .limit(Number(limit) || 4);
+      cache.set("randomCars", lastAddedCars, 180);
+      return res
+        .status(200)
+        .json({ data: lastAddedCars, message: "Last added cars" });
+    } catch (error) {
+      return res.status(404).json({ message: error.message });
+    }
+  }
 
   if (id) {
     try {
@@ -80,6 +103,21 @@ router.get("/", async (req, res) => {
     res.status(200).json(cars);
   } catch (error) {
     res.status(404).json({ message: error.message });
+  }
+});
+
+router.put("/counter", authMiddleware, async (req, res, next) => {
+  const { id } = req.body;
+  if (id) {
+    try {
+      const car = await CarModel.findById(id);
+      car.clickCounter = car.clickCounter + 1;
+      await car.save();
+      cache.flushAll();
+      res.status(200).json({ message: "Counter updated" });
+    } catch (error) {
+      next(error);
+    }
   }
 });
 

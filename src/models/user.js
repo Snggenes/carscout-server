@@ -17,7 +17,8 @@ const userSchema = new mongoose.Schema({
   },
   cars: { type: [String], default: []},
   favorites: { type: [String], default: []},
-
+  lastSearch: { type: String, default: ""},
+  lastSearchTime: { type: Date, default: Date.now },
 });
 
 const UserModel = mongoose.model("User", userSchema);

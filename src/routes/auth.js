@@ -71,6 +71,8 @@ router.get("/profile", async (req, res) => {
       _id: user._id,
       cars: user.cars,
       favorites: user.favorites,
+      lastSearch: user.lastSearch,
+      lastLogin: user.lastSearchTime,
     };
     return res.json({ safeUser });
   } catch (error) {
@@ -111,6 +113,20 @@ router.put("/favorites", authMiddleware, async (req, res) => {
     user.favorites.push(id);
     await user.save();
     res.status(200).json({ message: "Car added to favorites", data: user });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.put("/last-search", authMiddleware, async (req, res) => {
+  const user = req.user;
+  const search = new URLSearchParams(req.query).toString();
+  const searchTime = new Date();
+  try {
+    user.lastSearch = search;
+    user.lastSearchTime = searchTime;
+    await user.save();
+    res.status(200).json({ message: "Last search updated" });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
