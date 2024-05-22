@@ -105,14 +105,32 @@ router.put("/favorites", authMiddleware, async (req, res) => {
     if (isCarInFavorites) {
       user.favorites = user.favorites.filter((carId) => carId !== id);
       await user.save();
+      const safeUser = {
+        email: user.email,
+        username: user.username,
+        _id: user._id,
+        cars: user.cars,
+        favorites: user.favorites,
+        lastSearch: user.lastSearch,
+        lastLogin: user.lastSearchTime,
+      };
       return res
         .status(200)
-        .json({ message: "Car removed from favorites", data: user });
+        .json({ message: "Car removed from favorites", data: safeUser });
     }
 
     user.favorites.push(id);
     await user.save();
-    res.status(200).json({ message: "Car added to favorites", data: user });
+    const safeUser = {
+      email: user.email,
+      username: user.username,
+      _id: user._id,
+      cars: user.cars,
+      favorites: user.favorites,
+      lastSearch: user.lastSearch,
+      lastLogin: user.lastSearchTime,
+    };
+    res.status(200).json({ message: "Car added to favorites", data: safeUser });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

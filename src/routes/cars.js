@@ -32,31 +32,25 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
+router.get("/lastAdded", async (req, res) => {
+  const cachedCars = cache.get("lastAdded");
+  if (cachedCars) {
+    return res
+      .status(200)
+      .json({ data: cachedCars, message: "Last added cars" });
+  }
+
+  try {
+    const cars = await CarModel.find().sort({ createdAt: -1 }).limit(10);
+    cache.set("lastAdded", cars, 180);
+    res.status(200).json({ data: cars, message: "Last added cars" });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
 router.get("/", async (req, res) => {
   const { id } = req.query;
-  const { random } = req.query;
-  const { limit } = req.query;
-
-  if (random) {
-    const cachedCars = cache.get("randomCars");
-    if (cachedCars) {
-      return res
-        .status(200)
-        .json({ data: cachedCars, message: "Last added cars" });
-    }
-
-    try {
-      const lastAddedCars = await CarModel.find()
-        .sort({ createdAt: -1 })
-        .limit(Number(limit) || 4);
-      cache.set("randomCars", lastAddedCars, 180);
-      return res
-        .status(200)
-        .json({ data: lastAddedCars, message: "Last added cars" });
-    } catch (error) {
-      return res.status(404).json({ message: error.message });
-    }
-  }
 
   if (id) {
     try {
