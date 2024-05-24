@@ -10,6 +10,6 @@ mongoose.connection.on("connected", () => {
 
 const server = http.createServer(app);
 
-server.listen(4000, () => {
+server.listen(4000, "0.0.0.0", () => {
   console.log("Server is listening on port 4000");
 });
