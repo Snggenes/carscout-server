@@ -43,6 +43,7 @@ router.post("/login", async (req, res) => {
     return res
       .cookie("auth", token, {
         httpOnly: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       .json({ message: "Logged in" });
   } catch (error) {
