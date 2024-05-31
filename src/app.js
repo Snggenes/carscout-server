@@ -42,6 +42,7 @@ app.use(
           "https://www.tweedehandsauto.nl",
           "https://www.autoscout24.nl",
           "https://upload.wikimedia.org",
+          "https://t3.ftcdn.net",
         ],
       },
     },
