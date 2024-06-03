@@ -8,6 +8,49 @@ const dotenv = require("dotenv").config();
 
 const authMiddleware = require("../authMiddleware");
 
+router.get("/profile", async (req, res) => {
+  try {
+    const token = req.cookies.auth;
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized token" });
+    }
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await UserModel.findOne({ email: payload.email });
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized email" });
+    }
+    const safeUser = {
+      email: user.email,
+      username: user.username,
+      _id: user._id,
+      cars: user.cars,
+      favorites: user.favorites,
+      lastSearch: user.lastSearch,
+      lastLogin: user.lastSearchTime,
+      notification: user.notification,
+    };
+    return res.json({ safeUser });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+router.get("/protected", authMiddleware, (req, res) => {
+  const user = req.user;
+  return res.json({ user });
+});
+
+router.get("/favorites", authMiddleware, async (req, res) => {
+  const user = req.user;
+  const favorites = user.favorites;
+  try {
+    const cars = await CarModel.find({ _id: { $in: favorites } });
+    res.status(200).json({ data: cars });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 router.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
   const existingUser = await UserModel.findOne({ email });
@@ -55,37 +98,6 @@ router.post("/logout", (req, res) => {
   return res.clearCookie("auth").json({ message: "Logged out" });
 });
 
-router.get("/profile", async (req, res) => {
-  try {
-    const token = req.cookies.auth;
-    if (!token) {
-      return res.status(401).json({ message: "Unauthorized token" });
-    }
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await UserModel.findOne({ email: payload.email });
-    if (!user) {
-      return res.status(401).json({ message: "Unauthorized email" });
-    }
-    const safeUser = {
-      email: user.email,
-      username: user.username,
-      _id: user._id,
-      cars: user.cars,
-      favorites: user.favorites,
-      lastSearch: user.lastSearch,
-      lastLogin: user.lastSearchTime,
-    };
-    return res.json({ safeUser });
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-});
-
-router.get("/protected", authMiddleware, (req, res) => {
-  const user = req.user;
-  return res.json({ user });
-});
-
 router.put("/favorites", authMiddleware, async (req, res) => {
   const user = req.user;
   const { id } = req.body;
@@ -114,6 +126,7 @@ router.put("/favorites", authMiddleware, async (req, res) => {
         favorites: user.favorites,
         lastSearch: user.lastSearch,
         lastLogin: user.lastSearchTime,
+        notification: user.notification,
       };
       return res
         .status(200)
@@ -130,6 +143,7 @@ router.put("/favorites", authMiddleware, async (req, res) => {
       favorites: user.favorites,
       lastSearch: user.lastSearch,
       lastLogin: user.lastSearchTime,
+      notification: user.notification,
     };
     res.status(200).json({ message: "Car added to favorites", data: safeUser });
   } catch (error) {
@@ -151,14 +165,42 @@ router.put("/last-search", authMiddleware, async (req, res) => {
   }
 });
 
-router.get("/favorites", authMiddleware, async (req, res) => {
+router.put("/notification", authMiddleware, async (req, res, next) => {
   const user = req.user;
-  const favorites = user.favorites;
+  if (user.notification === true) {
+    user.notification = false;
+  } else {
+    user.notification = true;
+  }
   try {
-    const cars = await CarModel.find({ _id: { $in: favorites } });
-    res.status(200).json({ data: cars });
+    await user.save();
+    const safeUser = {
+      email: user.email,
+      username: user.username,
+      _id: user._id,
+      cars: user.cars,
+      favorites: user.favorites,
+      lastSearch: user.lastSearch,
+      lastLogin: user.lastSearchTime,
+      notification: user.notification,
+    };
+    res
+      .status(200)
+      .json({ message: "Notification updated", safeUser: safeUser });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    next(error);
+  }
+});
+
+router.delete("/delete", authMiddleware, async (req, res, next) => {
+  const user = req.user;
+  try {
+    await UserModel.deleteOne({ _id: user._id });
+    await CarModel.deleteMany({ _id: { $in: user.cars } });
+    res.clearCookie("auth");
+    res.status(200).json({ message: "User deleted" });
+  } catch (error) {
+    next(error);
   }
 });
 

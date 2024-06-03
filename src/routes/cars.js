@@ -7,31 +7,6 @@ const authMiddleware = require("../authMiddleware");
 
 const cache = new NodeCache();
 
-router.post("/", authMiddleware, async (req, res) => {
-  const user = req.user;
-
-  const { postcode: zipcode, houseNumber } = req.body;
-  const address = await addressVerify(zipcode, houseNumber);
-
-  if (!address.city) {
-    return res.status(400).json({ error: "Invalid address" });
-  }
-
-  const car = { ...req.body, address, owner: user._id };
-
-  try {
-    const newCar = new CarModel(car);
-    await newCar.save();
-    cache.flushAll();
-    user.cars.push(newCar._id);
-    await user.save();
-    res.status(201).json({ data: newCar, message: "Car created" });
-  } catch (error) {
-    console.log(error.message);
-    res.status(400).json({ error: error.message });
-  }
-});
-
 router.get("/lastAdded", async (req, res) => {
   const cachedCars = cache.get("lastAdded");
   if (cachedCars) {
@@ -97,6 +72,31 @@ router.get("/", async (req, res) => {
     res.status(200).json(cars);
   } catch (error) {
     res.status(404).json({ message: error.message });
+  }
+});
+
+router.post("/", authMiddleware, async (req, res) => {
+  const user = req.user;
+
+  const { postcode: zipcode, houseNumber } = req.body;
+  const address = await addressVerify(zipcode, houseNumber);
+
+  if (!address.city) {
+    return res.status(400).json({ error: "Invalid address" });
+  }
+
+  const car = { ...req.body, address, owner: user._id };
+
+  try {
+    const newCar = new CarModel(car);
+    await newCar.save();
+    cache.flushAll();
+    user.cars.push(newCar._id);
+    await user.save();
+    res.status(201).json({ data: newCar, message: "Car created" });
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json({ error: error.message });
   }
 });
 

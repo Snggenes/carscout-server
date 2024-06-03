@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema({
   favorites: { type: [String], default: []},
   lastSearch: { type: String, default: ""},
   lastSearchTime: { type: Date, default: Date.now },
+  notification: { type: Boolean, default: false },
 });
 
 const UserModel = mongoose.model("User", userSchema);
