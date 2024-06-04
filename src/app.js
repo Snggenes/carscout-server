@@ -49,6 +49,8 @@ app.use(
           "https://www.autoscout24.nl",
           "https://upload.wikimedia.org",
           "https://t3.ftcdn.net",
+          "https://i.pinimg.com",
+          "https://s.aolcdn.com",
         ],
       },
     },
