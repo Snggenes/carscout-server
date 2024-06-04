@@ -8,6 +8,7 @@ const authRouter = require("./routes/auth");
 const carsRouter = require("./routes/cars");
 const addressVerifyRouter = require("./routes/addressVerify");
 const distanceCalculationRouter = require("./routes/distanceCalculation");
+const licenceplatecheckRouter = require("./routes/licenceplatecheck");
 
 // const rateLimit = require("express-rate-limit");
 // const cors = require("cors");
@@ -70,6 +71,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/cars", carsRouter);
 app.use("/api/address-verify", addressVerifyRouter);
 app.use("/api/distance-calculation", distanceCalculationRouter);
+app.use("/api/licenceplatecheck", licenceplatecheckRouter);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../dist", "index.html"));
