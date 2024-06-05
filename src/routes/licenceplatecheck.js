@@ -12,7 +12,7 @@ router.get("/", async (req, res, next) => {
       throw new Error("RDW API request failed");
     }
     const data = await response.json();
-    res.status(200).json(data);
+    res.status(200).json(data[0]);
   } catch (error) {
     next(error);
   }
