@@ -1,5 +1,4 @@
 const errorMiddleware = async (error, req, res, next) => {
-    console.error(error);
     let errorMessage = "Internal server error";
     let statusCode = 500;
     if (error instanceof Error) {
