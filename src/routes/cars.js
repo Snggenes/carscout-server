@@ -75,6 +75,36 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/onmount", async (req, res) => {
+  const allCars = await CarModel.find();
+  const lenghtOfAllCars = allCars.length;
+
+  const carData = allCars.map((car) => {
+    return {
+      brand: car.brand,
+      model: car.model,
+      price: car.price,
+      year: car.year,
+    };
+  });
+
+  // for (let i = 0; i < lenghtOfAllCars; i++) {
+  //   let brandWithObjects = {};
+  //   let brand = allCars[i].brand;
+  //   let model = allCars[i].model;
+  //   let index = carData.findIndex((car) => car.brand === brand);
+  //   if (index === -1) {
+  //     brandWithObjects.brand = brand;
+  //     brandWithObjects.models = [model];
+  //     carData.push(brandWithObjects);
+  //   } else {
+  //     carData[index].models.push(model);
+  //   }
+  // }
+
+  res.status(200).json(carData);
+});
+
 router.post("/", authMiddleware, async (req, res) => {
   const user = req.user;
 
