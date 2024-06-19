@@ -6,6 +6,7 @@ const path = require("path");
 const errorMiddleware = require("./errorMiddleware");
 const authRouter = require("./routes/auth");
 const carsRouter = require("./routes/cars");
+const searchRouter = require("./routes/search");
 const addressVerifyRouter = require("./routes/addressVerify");
 const distanceCalculationRouter = require("./routes/distanceCalculation");
 const licenceplatecheckRouter = require("./routes/licenceplatecheck");
@@ -51,6 +52,7 @@ app.use("/api/cars", carsRouter);
 app.use("/api/address-verify", addressVerifyRouter);
 app.use("/api/distance-calculation", distanceCalculationRouter);
 app.use("/api/licenceplatecheck", licenceplatecheckRouter);
+app.use("/api/search", searchRouter);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../dist", "index.html"));

@@ -78,18 +78,35 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/onmount", async (req, res) => {
-  const allCars = await CarModel.find();
+  let cars = cache.get("carsWithBrandAndModel");
+  if (!cars) {
+    cars = await CarModel.find({}, { brand: 1, model: 1 });
+    cache.set("carsWithBrandAndModel", cars, 180);
+  }
 
-  const carData = allCars.map((car) => {
-    return {
-      brand: car.brand,
-      model: car.model,
-      price: car.price,
-      year: car.year,
-    };
-  });
+  let brandsWithModels = cache.get("brandsWithModels");
+  if (!brandsWithModels) {
+    const lenghtOfAllCars = cars.length;
+    const carData = [];
 
-  res.status(200).json(carData);
+    for (let i = 0; i < lenghtOfAllCars; i++) {
+      brandsWithModels = {};
+      let brand = cars[i].brand;
+      let model = cars[i].model;
+      let index = carData.findIndex((car) => car.brand === brand);
+      if (index === -1) {
+        brandsWithModels.brand = brand;
+        brandsWithModels.models = [model];
+        carData.push(brandsWithModels);
+      } else {
+        carData[index].models.push(model);
+      }
+      brandsWithModels = carData;
+    }
+    cache.set("brandsWithModels", brandsWithModels, 180);
+  }
+
+  res.status(200).json(brandsWithModels);
 });
 
 router.post("/", authMiddleware, async (req, res) => {

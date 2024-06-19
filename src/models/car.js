@@ -63,6 +63,11 @@ const carSchema = new mongoose.Schema({
   clickCounter: { type: Number, default: 0 },
 });
 
+carSchema.index({ brand: 1 });
+carSchema.index({ model: 1 });
+carSchema.index({ year: 1 });
+carSchema.index({ price: 1 });
+
 const CarModel = mongoose.model("Car", carSchema);
 
 module.exports = CarModel;
