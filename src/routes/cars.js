@@ -4,8 +4,10 @@ const CarModel = require("../models/car");
 const NodeCache = require("node-cache");
 const { addressVerify } = require("../helpers");
 const authMiddleware = require("../authMiddleware");
+const compression = require("compression");
 
 const cache = new NodeCache();
+router.use(compression());
 
 router.get("/lastAdded", async (req, res) => {
   const cachedCars = cache.get("lastAdded");
@@ -77,7 +79,6 @@ router.get("/", async (req, res) => {
 
 router.get("/onmount", async (req, res) => {
   const allCars = await CarModel.find();
-  const lenghtOfAllCars = allCars.length;
 
   const carData = allCars.map((car) => {
     return {
@@ -87,20 +88,6 @@ router.get("/onmount", async (req, res) => {
       year: car.year,
     };
   });
-
-  // for (let i = 0; i < lenghtOfAllCars; i++) {
-  //   let brandWithObjects = {};
-  //   let brand = allCars[i].brand;
-  //   let model = allCars[i].model;
-  //   let index = carData.findIndex((car) => car.brand === brand);
-  //   if (index === -1) {
-  //     brandWithObjects.brand = brand;
-  //     brandWithObjects.models = [model];
-  //     carData.push(brandWithObjects);
-  //   } else {
-  //     carData[index].models.push(model);
-  //   }
-  // }
 
   res.status(200).json(carData);
 });
