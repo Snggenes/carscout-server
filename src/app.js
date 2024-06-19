@@ -35,10 +35,15 @@ app.use(
           "https://i.pinimg.com",
           "https://s.aolcdn.com",
         ],
+        frameSrc: [
+          "'self'",
+          "https://upload-widget.cloudinary.com",
+        ]
       },
     },
   })
 );
+
 
 app.use(express.json());
 
