@@ -1,7 +1,7 @@
 ## Live Demo
 
 Check out the live demo of the project [here](https://carscout-rjs-ejs-2774c71ce9e3.herokuapp.com/).
-Check out the live demo of the project [here]([https://carscout-rjs-ejs-2774c71ce9e3.herokuapp.com/](https://next-js-carscout-ntqxjgr7r-enes-projects-d4f7f936.vercel.app/)).
+Check out the live demo of the project [here](https://carscout-rjs-ejs-2774c71ce9e3.herokuapp.com/](https://next-js-carscout-ntqxjgr7r-enes-projects-d4f7f936.vercel.app/).
 
 
 # CarsProject
