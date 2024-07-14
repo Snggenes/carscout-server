@@ -1,6 +1,11 @@
 ## Live Demo
 
-Welcome to my project! You can explore the website [here](https://next-js-carscout-ntqxjgr7r-enes-projects-d4f7f936.vercel.app/).
+# CarScout Project
+
+This is a web application similar to autoscout24. Please try it out.
+
+[Click here to explore it!](https://next-js-carscout.vercel.app)
+
 
 
 # CarsProject
